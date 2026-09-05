@@ -1,0 +1,3 @@
+masked_customer_id,masked_name,masked_phone,masked_email,masked_city,masked_risk_level
+C_MASK_001,J*** D***,98******10,j***@example.com,Chennai,LOW
+C_MASK_002,A*** S***,99******22,a***@example.com,Mumbai,MEDIUM

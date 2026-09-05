@@ -1,0 +1,32 @@
+{
+  "rules": [
+    {
+      "id": "RULE_1",
+      "description": "If account status is BLOCKED, transaction must not succeed.",
+      "condition": "account_status == 'BLOCKED'",
+      "enforce_failure_reason": "ACCOUNT_BLOCKED",
+      "enforce_transaction_status": "FAILED"
+    },
+    {
+      "id": "RULE_2",
+      "description": "If account status is CLOSED, transaction must fail.",
+      "condition": "account_status == 'CLOSED'",
+      "enforce_failure_reason": "ACCOUNT_CLOSED",
+      "enforce_transaction_status": "FAILED"
+    },
+    {
+      "id": "RULE_3",
+      "description": "If transaction amount > balance, transaction must fail.",
+      "condition": "amount > balance",
+      "enforce_failure_reason": "INSUFFICIENT_FUNDS",
+      "enforce_transaction_status": "FAILED"
+    },
+    {
+      "id": "RULE_5",
+      "description": "Transaction amount must be positive.",
+      "condition": "amount <= 0",
+      "enforce_failure_reason": "INVALID_AMOUNT",
+      "enforce_transaction_status": "FAILED"
+    }
+  ]
+}

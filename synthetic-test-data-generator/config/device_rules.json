@@ -1,0 +1,9 @@
+{
+  "device_os_mapping": {
+    "Android Mobile": ["Android 12", "Android 13", "Android 14", "Android 15"],
+    "iPhone": ["iOS 16", "iOS 17", "iOS 18"],
+    "Tablet": ["Android 12", "Android 13", "Android 14"],
+    "iPad": ["iPadOS 16", "iPadOS 17", "iPadOS 18"],
+    "Low-end Android": ["Android 10", "Android 11", "Android 12"]
+  }
+}

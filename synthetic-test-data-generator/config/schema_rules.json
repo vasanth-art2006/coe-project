@@ -1,0 +1,26 @@
+{
+  "customer": {
+    "age": {
+      "min": 18,
+      "max": 80
+    },
+    "risk_levels": ["LOW", "MEDIUM", "HIGH"],
+    "status": ["ACTIVE", "INACTIVE"]
+  },
+  "account": {
+    "balance": {
+      "min": 0,
+      "max": 1000000
+    },
+    "types": ["SAVINGS", "CURRENT", "SALARY", "FIXED_DEPOSIT"],
+    "status": ["ACTIVE", "BLOCKED", "CLOSED"]
+  },
+  "transaction": {
+    "amount": {
+      "min": 1,
+      "max": 500000
+    },
+    "types": ["UPI", "CARD", "TRANSFER", "BILL_PAYMENT", "ATM"],
+    "status": ["SUCCESS", "FAILED", "PENDING"]
+  }
+}

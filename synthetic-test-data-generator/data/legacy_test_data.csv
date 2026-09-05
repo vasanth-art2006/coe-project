@@ -1,0 +1,4 @@
+old_customer,old_account,device,os,amount,type,status
+C001,A001,Phone,Android,5000,UPI,SUCCESS
+C002,A002,Tablet,iOS,200,CARD,FAILED
+C003,A003,Phone,Android,1500,TRANSFER,PENDING

@@ -1,0 +1,20 @@
+{
+  "transaction_types": {
+    "UPI": 0.50,
+    "CARD": 0.20,
+    "TRANSFER": 0.15,
+    "BILL_PAYMENT": 0.10,
+    "ATM": 0.05
+  },
+  "device_distribution": {
+    "Android Mobile": 0.60,
+    "iPhone": 0.25,
+    "Tablet": 0.10,
+    "Low-end Android": 0.05
+  },
+  "transaction_status": {
+    "SUCCESS": 0.85,
+    "FAILED": 0.10,
+    "PENDING": 0.05
+  }
+}
