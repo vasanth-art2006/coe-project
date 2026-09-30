@@ -3,11 +3,20 @@ from datetime import datetime
 from validation.business_validator import validate_business_rules
 
 def generate_scenarios(customers, accounts, devices, transactions):
+    """
+    Generate test scenarios mapped from accounts, devices, and transactions.
+    Optimized with O(1) hash maps for sub-second generation at scale.
+    """
     scenarios = []
     
+    # Pre-index accounts and devices for O(1) instant lookup
+    accounts_map = {a['account_id']: a for a in accounts}
+    devices_map = {d['device_id']: d for d in devices}
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
     for i, t in enumerate(transactions):
-        account = next((a for a in accounts if a['account_id'] == t['account_id']), None)
-        device = next((d for d in devices if d['device_id'] == t['device_id']), None)
+        account = accounts_map.get(t['account_id'])
+        device = devices_map.get(t['device_id'])
         
         if not account or not device:
             continue
@@ -40,7 +49,7 @@ def generate_scenarios(customers, accounts, devices, transactions):
             'expected_result': expected_result,
             'scenario_category': 'NEGATIVE' if not biz_val['is_valid'] else 'POSITIVE',
             'validation_status': 'PASS',
-            'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'created_at': now_str,
             'version': 1
         }
         scenarios.append(scenario)

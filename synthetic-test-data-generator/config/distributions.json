@@ -16,5 +16,44 @@
     "SUCCESS": 0.85,
     "FAILED": 0.10,
     "PENDING": 0.05
+  },
+  "amount_distributions": {
+    "pareto": {
+      "name": "Pareto (Power-Law) - UPI / Micropayments",
+      "alpha": 1.8,
+      "x_m": 10.0,
+      "min_amount": 1.0,
+      "max_amount": 100000.0,
+      "description": "80% of transactions are low-value micro-payments under 500 INR, with heavy long tail for occasional large payments."
+    },
+    "lognormal": {
+      "name": "Log-Normal - Retail & Card Spending",
+      "mean": 6.2,
+      "sigma": 1.35,
+      "min_amount": 1.0,
+      "max_amount": 250000.0,
+      "description": "Right-skewed multiplicative distribution typical of merchant POS and debit card retail spending."
+    },
+    "gaussian": {
+      "name": "Gaussian (Normal) - Scheduled & ATM Transfers",
+      "mean": 3500.0,
+      "std": 1400.0,
+      "min_amount": 100.0,
+      "max_amount": 20000.0,
+      "description": "Bell-curve centered around regular utility bills and standard round ATM cash withdrawals."
+    },
+    "uniform": {
+      "name": "Uniform Random (Baseline Model)",
+      "min_amount": 1.0,
+      "max_amount": 50000.0,
+      "description": "Flat probability density used in naive baseline generators."
+    }
+  },
+  "diurnal_activity_model": {
+    "enabled": true,
+    "peaks": [
+      { "hour": 13.5, "std": 1.5, "weight": 0.45 },
+      { "hour": 19.5, "std": 2.0, "weight": 0.55 }
+    ]
   }
 }
