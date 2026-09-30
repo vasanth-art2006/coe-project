@@ -1,6 +1,8 @@
 import json
 import os
+from functools import lru_cache
 
+@lru_cache(maxsize=1)
 def load_device_rules():
     path = os.path.join(os.path.dirname(__file__), '..', 'config', 'device_rules.json')
     with open(path, 'r') as f:
