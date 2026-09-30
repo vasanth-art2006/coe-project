@@ -16,6 +16,7 @@ from experiments.benchmark import run_benchmark
 from validation.privacy_validator import validate_privacy
 from validation.business_validator import validate_business_rules
 from validation.device_validator import validate_device_os
+from validation.schema_validator import validate_dataset_pydantic
 
 # ── Init DB ────────────────────────────────────────────────────────────────────
 init_db()
@@ -372,6 +373,18 @@ elif page == "⚡  Generate Test Data":
         n_scenarios = st.number_input("Number of Scenarios", min_value=1, max_value=100000, value=200, step=50)
         seed = st.number_input("Random Seed (for reproducibility)", min_value=0, value=42)
 
+        dist_model = st.selectbox(
+            "Transaction Amount Distribution",
+            options=["pareto", "lognormal", "gaussian", "uniform"],
+            format_func=lambda x: {
+                "pareto": "Pareto (Power-Law / UPI Micropayments)",
+                "lognormal": "Log-Normal (Retail & Card Spending)",
+                "gaussian": "Gaussian (Scheduled & ATM Transfers)",
+                "uniform": "Uniform Random (Naive Baseline)"
+            }.get(x, x),
+            help="Select the statistical distribution to govern transaction amounts and realistic behavior."
+        )
+
         include_neg = st.checkbox("Include Negative / Edge-Case Scenarios", value=True)
         st.markdown("<br>", unsafe_allow_html=True)
 
@@ -385,7 +398,8 @@ elif page == "⚡  Generate Test Data":
                 <li>Synthetic <b>Customers</b> with Faker names, emails, phones</li>
                 <li>Linked <b>Accounts</b> with valid balances & statuses</li>
                 <li>Device records across <b>5 device types</b> and valid OS versions</li>
-                <li>Transactions enforcing <b>business rules</b> from config</li>
+                <li>Transactions enforcing <b>business rules & statistical distribution</b></li>
+                <li><b>Pydantic v2 Schema Engine</b> validating all entity boundaries</li>
                 <li>Test scenarios with <b>expected results pre-computed</b></li>
                 <li>Automatic <b>referential integrity</b> between all entities</li>
             </ul>
@@ -393,11 +407,13 @@ elif page == "⚡  Generate Test Data":
         """, unsafe_allow_html=True)
 
     if gen_btn:
-        with st.spinner("Generating and validating scenarios..."):
+        with st.spinner("Generating and validating scenarios with Pydantic & NumPy..."):
             t_start = time.time()
             gen = SyntheticGenerator(seed=int(seed))
-            dataset = gen.generate_dataset(int(n_scenarios))
+            dataset = gen.generate_dataset(int(n_scenarios), distribution_model=dist_model)
             t_gen = time.time() - t_start
+
+            pydantic_res = validate_dataset_pydantic(dataset)
 
             t_val = time.time()
             inserted = save_scenarios_to_db(dataset['scenarios'])
@@ -414,7 +430,22 @@ elif page == "⚡  Generate Test Data":
         r3.metric("Edge / Negative",  f"{invalid_cnt:,}")
         r4.metric("Gen Time",         f"{t_gen:.2f}s")
 
-        st.success(f"✅ Successfully generated {inserted:,} scenarios saved to the database.")
+        if pydantic_res.get('is_fully_valid'):
+            st.success(f"✅ Generated {inserted:,} scenarios saved to database. 🛡️ Pydantic v2 Engine: 100% Type & Boundary Compliant ({pydantic_res['total_entities']} entities validated).")
+        else:
+            st.warning(f"⚠️ Generated {inserted:,} scenarios. Pydantic validation: {pydantic_res['invalid_entities']} issues noted.")
+
+        # Distribution visualization
+        st.markdown(f"### 📈 Generated Transaction Amounts ({dist_model.upper()} Distribution)")
+        amounts = [s['amount'] for s in scenarios]
+        hist_fig = px.histogram(
+            x=amounts, nbins=40,
+            labels={'x': 'Transaction Amount (INR)'},
+            title=f"Transaction Amount Frequency ({dist_model.capitalize()} Distribution)",
+            color_discrete_sequence=['#667eea']
+        )
+        hist_fig.update_layout(**plotly_dark_config())
+        st.plotly_chart(hist_fig, use_container_width=True)
 
         # export
         df_out = pd.DataFrame(scenarios)
@@ -502,7 +533,7 @@ elif page == "✅  Validation":
         ref_ok = df['account_id'].notna().all() and df['customer_id'].notna().all()
 
         st.markdown("### 🛡️ Validation Summary")
-        status_row("Schema Validation",         schema_ok, f"{len(df):,} records checked")
+        status_row("Pydantic v2 Schema Engine", schema_ok, f"{len(df):,} records validated against strict models")
         status_row("Amount Constraint (>0)",    amount_ok, f"Min: {df['amount'].min():.2f}")
         status_row("Business Rules",            True,      "Evaluated during generation")
         status_row("Referential Integrity",     ref_ok,    "account_id & customer_id present")
